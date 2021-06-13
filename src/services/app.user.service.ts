@@ -39,8 +39,7 @@ export class UserService {
       throw new AuthError('token is invalid');
     }
 
-    if (this.isTokenExpired(token)) {
-      this.tokenRepository.delete(token.id);
+    if (this.deleteTokenIfExpired(token)) {
       throw new AuthError('token is expired');
     }
 
