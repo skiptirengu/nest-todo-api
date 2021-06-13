@@ -50,6 +50,7 @@ export class UserService {
     const oldToken = this.tokenRepository.findByRefreshToken(refreskToken);
     this.tokenRepository.delete(oldToken.id);
     const token = this.createToken();
+    token.userId = oldToken.userId;
     this.tokenRepository.create(token);
     return token;
   }
