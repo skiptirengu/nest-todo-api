@@ -17,6 +17,12 @@ export class TokenRepository {
     );
   }
 
+  findByRefreshToken(refreshToken: string): Token {
+    return new Token(
+      this.databaseService.findBy(Tables.auth, 'refreshToken', refreshToken),
+    );
+  }
+
   delete(id: string): boolean {
     return this.databaseService.delete(Tables.auth, id);
   }

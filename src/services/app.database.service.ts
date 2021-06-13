@@ -9,7 +9,7 @@ export class DatabaseService {
   private readonly database: JsonDB = new JsonDB(
     'runtime/database',
     true,
-    false,
+    true,
     '/',
   );
 

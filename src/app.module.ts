@@ -1,4 +1,5 @@
 import { Logger, Module, NestModule } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from 'src/controllers/app.controller';
 import { DatabaseService } from 'src/services/app.database.service';
 import { CurrentUserProvider } from 'src/services/app.current-user-provider.service';
@@ -11,7 +12,7 @@ import { TokenRepository } from './repositories/app.token.repository';
 import { UserRepository } from './repositories/app.user.repository';
 
 @Module({
-  imports: [],
+  imports: [ConfigModule.forRoot()],
   controllers: [AppController, TodoController, UserController],
   providers: [
     CurrentUserProvider,

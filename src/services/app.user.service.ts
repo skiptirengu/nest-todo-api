@@ -1,6 +1,7 @@
 import { createHash, randomBytes } from 'crypto';
 import { DateTime } from 'luxon';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { User } from 'src/models/app.user.model';
 import { Token } from 'src/models/app.token.model';
 import { DuplicatedEntityError } from '../infra/errors/app.duplicated-entity.error';
@@ -18,6 +19,7 @@ export class UserService {
     private readonly userRepository: UserRepository,
     private readonly tokenRepository: TokenRepository,
     private readonly currentUserProvider: CurrentUserProvider,
+    private readonly configService: ConfigService,
   ) {}
 
   /**
@@ -37,12 +39,20 @@ export class UserService {
       throw new AuthError('token is invalid');
     }
 
-    if (DateTime.utc().toMillis() > token.expires) {
+    if (this.isTokenExpired(token)) {
       this.tokenRepository.delete(token.id);
       throw new AuthError('token is expired');
     }
 
     return token.userId;
+  }
+
+  renewToken(refreskToken: string): Token {
+    const oldToken = this.tokenRepository.findByRefreshToken(refreskToken);
+    this.tokenRepository.delete(oldToken.id);
+    const token = this.createToken();
+    this.tokenRepository.create(token);
+    return token;
   }
 
   generateToken(loginDetails: UserLogin): Token {
@@ -57,12 +67,14 @@ export class UserService {
 
     try {
       token = this.tokenRepository.findByUserId(user.id);
-      token = this.createToken(user.id, token.id);
-      exist = true;
+      exist = !this.deleteTokenIfExpired(token);
+      token = this.createToken(exist ? token : null);
     } catch (error) {
-      token = this.createToken(user.id);
+      token = this.createToken();
       exist = false;
     }
+
+    token.userId = user.id;
 
     return exist
       ? this.tokenRepository.update(token)
@@ -87,12 +99,34 @@ export class UserService {
     return this.userRepository.findById(this.currentUserProvider.id());
   }
 
-  private createToken(userId: string, id: string = null): Token {
+  private deleteTokenIfExpired(token: Token): boolean {
+    const expired = this.isTokenExpired(token);
+    if (expired) this.tokenRepository.delete(token.id);
+    return expired;
+  }
+
+  private isTokenExpired(token: Token): boolean {
+    return DateTime.utc().toMillis() > token.expires;
+  }
+
+  private createToken(token?: Token): Token {
+    const expires = DateTime.utc()
+      .plus({ minutes: this.getTokenExpiration() })
+      .toMillis();
+
     return new Token({
-      id: id ?? randomBytes(64).toString('hex'),
-      expires: DateTime.utc().plus({ minutes: 30 }).toMillis(),
-      userId,
+      id: token?.id ?? this.randomToken(),
+      refreshToken: token?.refreshToken ?? this.randomToken(),
+      expires,
     });
+  }
+
+  private randomToken(): string {
+    return randomBytes(32).toString('hex');
+  }
+
+  private getTokenExpiration(): number {
+    return this.configService.get<number>('token.expiration.minutes', 60);
   }
 
   private hashPassword(password: string) {

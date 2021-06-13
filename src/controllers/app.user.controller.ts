@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Post,
+  Query,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -39,5 +40,12 @@ export class UserController {
   @HttpCode(200)
   login(@Body() req: UserLogin): Token {
     return this.userService.generateToken(req);
+  }
+
+  @Post('renew_token')
+  @HttpCode(200)
+  @HttpCode(404)
+  refreshToken(@Query('refreshToken') refreshToken: string): Token {
+    return this.userService.renewToken(refreshToken);
   }
 }

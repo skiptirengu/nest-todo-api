@@ -13,4 +13,10 @@ export class Token extends DatabaseModel<Token> {
    * Time which the token is set to expire (unix timestamp)
    */
   expires: number;
+
+  @Expose()
+  /**
+   * Refresh token associated with the access token
+   */
+  refreshToken: string;
 }

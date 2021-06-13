@@ -1,5 +1,6 @@
 import { NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from 'src/app.module';
 import { HTTP } from 'src/constants/app.http.constants';
@@ -16,7 +17,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ErrorInterceptor());
 
-  const config = new DocumentBuilder()
+  const swaggerConfig = new DocumentBuilder()
     .setTitle('Todo API')
     .setDescription('Simple Todo API')
     .setVersion('1.0')
@@ -26,10 +27,13 @@ async function bootstrap() {
     )
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(3003);
+  const config = app.get(ConfigService);
+  const port = config.get<number>('server.port', 3003);
+
+  await app.listen(port);
 }
 
 bootstrap();
