@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { Tables } from 'src/constants/app.database.constants';
 import { Todo } from 'src/models/app.todo.model';
-import { DatabaseService, Tables } from 'src/services/app.database.service';
+import { DatabaseService } from 'src/services/app.database.service';
 
 @Injectable()
 export class TodoRepository {

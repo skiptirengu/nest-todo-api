@@ -1,13 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { JsonDB } from 'node-json-db';
+import { Tables } from 'src/constants/app.database.constants';
 import { DatabaseModel } from 'src/models/app.database.model';
 import { EntityNotFoundError } from '../infra/errors/app.entity-not-found.error';
-
-export enum Tables {
-  user = 'user',
-  todo = 'todo',
-  auth = 'auth',
-}
 
 @Injectable()
 export class DatabaseService {
