@@ -10,7 +10,7 @@ import {
   Put,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { CreateTodo } from 'src/dtos/app.todo.create.dto';
 import { UpdateTodo } from 'src/dtos/app.todo.update.dto';
 import { AuthInterceptor } from 'src/infra/http/app.auth.interceptor';
@@ -25,29 +25,29 @@ export class TodoController {
 
   @Delete(':id')
   @HttpCode(204)
-  @HttpCode(404)
+  @ApiResponse({ status: 404 })
   delete(@Param('id') id: string): void {
     this.todoService.delete(id);
   }
 
   @Get(':id')
   @HttpCode(200)
-  @HttpCode(404)
+  @ApiResponse({ status: 404 })
   get(@Param('id') id: string): Todo {
     return this.todoService.findById(id);
   }
 
   @Post()
   @HttpCode(201)
-  @HttpCode(400)
+  @ApiResponse({ status: 400 })
   create(@Body() req: CreateTodo): Todo {
     return this.todoService.create(req);
   }
 
   @Put(':id')
   @HttpCode(200)
-  @HttpCode(400)
-  @HttpCode(404)
+  @ApiResponse({ status: 400 })
+  @ApiResponse({ status: 404 })
   update(@Param('id') id: string, @Body() req: UpdateTodo): Todo {
     return this.todoService.update(id, req);
   }

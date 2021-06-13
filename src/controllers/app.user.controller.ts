@@ -8,7 +8,7 @@ import {
   Query,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { UserService } from 'src/services/app.user.service';
 import { CreateUser } from 'src/dtos/app.user.create.dto';
 import { UserLogin } from 'src/dtos/app.user.login.dto';
@@ -31,7 +31,7 @@ export class UserController {
 
   @Post()
   @HttpCode(201)
-  @HttpCode(400)
+  @ApiResponse({ status: 400 })
   create(@Body() req: CreateUser): User {
     return this.userService.create(req);
   }
@@ -44,7 +44,7 @@ export class UserController {
 
   @Post('renew_token')
   @HttpCode(200)
-  @HttpCode(404)
+  @ApiResponse({ status: 404 })
   refreshToken(@Query('refreshToken') refreshToken: string): Token {
     return this.userService.renewToken(refreshToken);
   }
