@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -17,7 +18,7 @@ import { Todo } from 'src/models/app.todo.model';
 import { TodoService } from 'src/services/app.todo.service';
 
 @ApiBearerAuth('token')
-@UseInterceptors(AuthInterceptor)
+@UseInterceptors(AuthInterceptor, ClassSerializerInterceptor)
 @Controller('todos')
 export class TodoController {
   constructor(private readonly todoService: TodoService) {}
