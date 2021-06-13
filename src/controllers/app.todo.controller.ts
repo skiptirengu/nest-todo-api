@@ -47,7 +47,7 @@ export class TodoController {
   @HttpCode(200)
   @HttpCode(400)
   @HttpCode(404)
-  update(@Param('id') id: string, @Body() req: UpdateTodo) {
+  update(@Param('id') id: string, @Body() req: UpdateTodo): Todo {
     return this.todoService.update(id, req);
   }
 
